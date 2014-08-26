@@ -1,0 +1,33 @@
+from django.conf.urls import patterns, include, url
+
+# Uncomment the next two lines to enable the admin:
+from django.contrib import admin
+admin.autodiscover()
+
+urlpatterns = patterns('',
+    # Examples:
+    # url(r'^$', 'RightArm.views.home', name='home'),
+    # url(r'^RightArm/', include('RightArm.foo.urls')),
+
+    url(r'^login/$', 'usermanagement.views.user_login', name='user_login'),
+    url(r'^user-home/$', 'usermanagement.views.user_home', name='user_home'),
+    url(r'^accounts/', include('registration.urls')),
+    url(r'^$', 'usermanagement.views.home', name='home'),
+    url(r'^accounts/profile/', include('Social.urls'), name='profile'),
+    url(r'^projects/', include('Projects.urls')),
+    url(r'^social/', include('Social.urls')),
+    url(r'^faq/', 'faq.views.faq',name='faq'),
+    url(r'^configure/(?P<key>.*)/$', 'usermanagement.views.configure', name='configure'),
+    url(r'^manage_configure/(?P<key>.*)/(?P<task>(:?add|:?edit|:?delete|:?active))/$', 'usermanagement.views.manage_configure', name='configure'),
+    url(r'^problems/', include('Problems.urls')),
+    url(r'^logout/', 'usermanagement.views.user_logout', name='user_logout'),
+    url(r'^google/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
+    url(r'^google/login-complete/$', 'django_openid_auth.views.login_complete', name='openid-complete'),
+    url(r'^check-user/$', 'usermanagement.views.check_user', name='check_user'),
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:
+    url(r'^admin/', include(admin.site.urls)),
+)

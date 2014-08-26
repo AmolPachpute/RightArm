@@ -1,0 +1,21 @@
+{% load i18n %}
+{% trans "Activate account at" %} {{ site.name }}:
+
+
+RightArm Registration Confirmation
+
+Dear {% user %}
+
+Please click on the below link to complete your registration.
+
+http://{{ site.domain }}{% url 'registration_activate' activation_key %}
+
+If you have not tried to register with RightArm and this email is unsolicited then please Click here and report back to us.
+
+
+{% blocktrans %}Link is valid for {{ expiration_days }} days.{% endblocktrans %}
+
+Thank you,
+Devendra Bahadur,
+Head, India Operations
+Right Arm

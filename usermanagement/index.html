@@ -1,0 +1,513 @@
+﻿{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+{% load fms %}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+{% block title %}<title>RIGHTARM - beyond words</title>{% endblock %}
+<link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+<!--Common Script-->
+<script type="text/javascript" src="/static/js/respond.js"></script>
+<script type="text/javascript" src="/static/js/html5.js"></script>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+
+
+
+<!-- css3-mediaqueries for IE less than 9 -->
+
+<script type="text/javascript" src="/static/js/fancyBox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+<!--CSS Srat-->
+
+<!-- Add fancyBox main JS and CSS files -->
+<script type="text/javascript" src="/static/js/fancyBox/source/jquery.fancybox.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/js/fancyBox/source/jquery.fancybox.css" media="screen" />
+
+
+<link rel="stylesheet" href="/static/css/style.css" />
+<!--[if lt IE 9]><link href="/static/css/ie.css" rel="stylesheet" type="text/css" /><![endif]-->
+<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--[if lt IE 9]><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+
+
+<script type="text/javascript" src="/static/js/jquery.validate.js"></script>
+
+
+
+<script>
+        $(document).ready(function(){
+		$.validator.addMethod("pwdcompare", function(value, element) {
+                var pwd1 = $("#id_password1").val();
+                return pwd1==value;},
+            "Passwords do not match ");
+
+            $("#register_form").validate({
+                rules : {
+                    name : {required : true, },
+					first_name : {required : true, },
+					last_name : {required : true, },
+					pincode : {required : true, number:true},
+					email : {required : true, email:true },
+					country: { required: true },
+					password1 : {required : true, },
+					password2 : {required : true, pwdcompare:true },
+
+                },
+                 submitHandler : function (){
+                        $.ajax({
+                        type: "get",
+                        url: "/check-user/",
+                        dataType:"json",
+                        data: {'email':$('#email').val()},
+                        async: false,
+                        success: function(data) {
+                                    if (data.success == true) {
+										$("#register_errors").html("");
+									    return registerfunc();
+									}
+									else
+									{
+										$("#register_errors").html("<h4 style='color: red;'>Email Already Exists</h4>");
+										return false;
+									}
+                        }
+                    });
+                  },
+            });
+
+        });
+    </script>
+
+<script>
+        $(document).ready(function(){
+
+            $("#login_form").validate({
+                rules : {
+                    username : {required : true, },
+					password : {required : true, },
+                },
+                 submitHandler : function (){
+                        $.ajax({
+                        type: "POST",
+                        url: "/login/",
+                        dataType:"json",
+                        data : $($('#login_form')).serialize(),
+                        success: function(data) {
+								alert("Testing for mobile devices ..please wait");
+                                if (data.success == true) {
+									window.location.replace("{% url 'user_profile' %}");
+								}
+								else
+								{
+									$("#login_errors").html("<h2 style='color: red;'>" + data.error_msg + "</h2>");
+								}
+                        }
+                    });
+                  },
+            });
+
+        });
+    </script>
+
+
+
+
+
+
+
+<script>
+	function registerfunc(){
+        $.ajax({
+                type:'POST',
+                url:"{% url 'registration_register' %}",
+				data : $($('#register_form')).serialize(),
+				async: false,
+                success:function(data){
+					alert('Please click the link sent to your email to complete registration.');
+					window.location = '/';
+                }
+        });
+		return false;
+    }
+</script>
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+	// Input Box Placeholder
+	function fnremove(arg,val)	{
+		if (arg.value == '') {arg.value = val}
+	}
+	function fnshow(arg,val)	{
+		if (arg.value == val) {arg.value = ''}
+	}
+
+	$( document ).ready(function() {
+	  fnChangePasswordType = function(){
+	    if($('#passwordID').attr('type')=='text'){
+	     $('#passwordID').attr('type','password');
+		}
+	  }
+		//Collapse and expand
+		//login
+		$('#login-content').hide();
+		$('#login-content').append();
+		$('#login').click(function() {
+			$('#login-content').slideToggle(350);
+			$('#login').toggleClass('active');
+			return false;
+		});
+	});
+</script>
+
+<script type = "text/javascript">
+    $('#resultn_id').hide();
+    function search_function(){
+        var search_txt = $('#search_id').val();
+        if (search_txt.length > 0){
+            $.ajax({
+                type : "GET",
+                url : "/country-search-results/",
+                data :{'search_val':search_txt},
+                success: function(data) {
+                    $('#resultn_id').html(data);
+                    $('#resultn_id').show();
+                }
+            });
+            return false;
+        } else {$('#resultn_id').hide();}
+    }
+</script>
+
+<!--  Responsive CSS  -->
+<link rel="stylesheet" href="/static/css/meanmenu.css" />
+<link rel="stylesheet" href="/static/css/media.css" />
+<script type="text/javascript" src="/static/js/jquery.selectbox-0.1.3.js"></script>
+
+{% block disablebackbutton %}   <!-- To disable back button on user login -->
+	 <script type="text/javascript" language="javascript">
+	 $(document).ready(function(){
+
+		  DisableBackButton();
+		  window.onload = DisableBackButton;
+		  window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+		  window.onunload = function() { void (0) }
+		  });
+
+	 function DisableBackButton() {
+		  window.history.forward()
+	 }
+</script>
+
+{% endblock %}
+
+
+</head>
+<body class="home">
+
+	  <section class="container"><!--Container starts-->
+	<header><!-- Header Starts -->
+  		<section class="wrapper"><!--Header Box Starts-->
+            <div class="logo">
+                <a {% if request.user.is_authenticated %}
+                        href="/user-profile/"
+                   {% else %}
+                        href="/"
+                   {% endif %}>
+                    <img src="/static/images/logo.jpg" alt="RIGHTARM - beyond words" title="RIGHTARM - beyond words">
+                </a>
+            </div>
+
+            {% block midbar %}
+            <nav class="menu"><!--Menu Starts-->
+                <div class="nav">
+
+                    <ul>
+						{% if not request.user.is_authenticated %}
+                        <li><a href="/join-rightarm/">Sign Up</a></li>
+                        <li>
+                        	<a href="#" id="login">Log in</a>
+                            <ul id="login-content">
+                            	<li>
+									<form action="{% url 'user_login' %}" method="POST" id="login_form">{% csrf_token %}
+										<div class="login-content">
+										<img src="/static/images/up-arrow.png" alt="">
+											<div id="login_errors"></div>
+										<input type="text" name="username"  placeholder="Username"  >
+										<input type="password" name="password" placeholder="Password">
+										<input type="submit" value="Submit" name="Submit" >
+										<div class="login-chkbox"><input type="checkbox" name="1" class="styled" /> Keep me logged in</div>
+										<a href="/accounts/password/reset/">Forgot password?</a>
+										</div>
+									</form>
+                            	</li>
+                            </ul>
+                        </li>
+						{% else %}
+							<!--li><a><h5>Welcome &nbsp;&nbsp;{{request.user.first_name}}</h5> </a></li-->
+						{% endif %}
+
+                         <li>
+                            <a href="/problems/challenge/">Give</a>
+                        </li>
+						<li>
+                            <a href="/problems/challenge/#receiver">Receive</a>
+                        </li>
+                        <li>
+                            <a {% with request|get_latest_topic as top_id %} href="/discussions/topic/{{top_id}}" {% endwith %} >Discussion</a>
+                        </li>
+                        <li><a href="{% url 'faq' %}">FAQ</a></li>
+                        <li class="#"><a href="/about-us/">About us</a></li>
+                        <li><a href="{% url 'contact_us' %}">Contact us</a></li>
+                    </ul>
+
+                </div>
+            </nav><!--Menu Ends-->
+
+            {% if request.user.is_authenticated %}
+            <div class="welcome_name">
+                  <div class="icon_name">
+                  <img src="/static/images/16.png" alt="">
+                    <p>Welcome {{request.user.first_name}}</p>
+                   </div>
+             </div>
+             {% endif %}
+
+            {% endblock %}
+
+			<div class="flex-caption"><span class="heading">Unleash the Unselfish Gene!</span><br><span class="sub-heading">We live in a world of abundance and waste in the midst of great need and deprivation.<br/>RightArm is a collaborative platform to enable you to make a change in this  world by actively Giving, by graciously Receiving, or by helping intermediate that process. RightArm believes that mankind has an inborn instinct to give and to cooperate ; we seek the expression of that Unselfish Gene.<br/></span></div>
+					<div class="link-btn">
+						<a href="{% url 'about_us' %}">Learn More <span></span></a>
+						<a href="#signup-section">Sign Up<span></span></a>
+					</div>
+        </section><!--Header Box Ends-->
+	</header><!-- Header Ends -->
+</section><!--Container Ends-->
+
+{% block content %}
+<section class="contentarea"><!--Contentarea Top Starts-->
+	<section class="wrapper"><!--wrapper Starts-->
+		<section class="work-pad"><!--how it works Starts-->
+        	<h1><span>how it works</span></h1>
+            <div class="work-list-pad">
+                <div class="work-list">
+                    <!--a href="#"-->
+                        <div class="ico-pad"><img src="/static/images/ico-signup.png" alt=""></div>
+                        <div class="caption-txt">Sign up</div>
+                    <!--/a-->
+                </div>
+                <div class="arrow"></div>
+                <div class="work-list">
+                    <!--a href="#"-->
+                        <div class="ico-pad"><img src="/static/images/ico-join.png" alt=""></div>
+                        <div class="caption-txt">Submit an issue/ Problem<span></span></div>
+                    <!--/a-->
+                </div>
+                <div class="arrow"></div>
+                <div class="work-list">
+                    <!--a href="#"-->
+                        <div class="ico-pad"><img src="/static/images/ico-project.png" alt=""></div>
+                        <div class="caption-txt">Give, Receive, Collaborate</span></div>
+                    <!--/a-->
+                </div>
+                <div class="arrow"></div>
+                <div class="work-list">
+                    <!--a href="#"-->
+                        <div class="ico-pad"><img src="/static/images/ico-share.png" alt=""></div>
+                        <div class="caption-txt">Tell your Friends</span></div>
+                    <!--/a-->
+                </div>
+                <div class="arrow"></div>
+                <div class="work-list">
+                    <!--a href="#"-->
+                        <div class="ico-pad"><img src="/static/images/ico-make.png" alt=""></div>
+                        <div class="caption-txt">SUCCESS STORIES</div>
+                    <!--/a-->
+                </div>
+           	</div>
+            <div class="link-btn">
+            	<a href="{% url 'faq' %}">I have a question! <span></span></a>
+                <a href="/about-us/#s1">Testimonials<span></span></a>
+            </div>
+        </section><!--how it works Ends-->
+
+        <style>
+            .part-txtpad p {padding-left:14px;}
+        </style>
+
+        <section class="part-pad" id="signup-section"><!--Part of RightArm Starts-->
+        	<h1><span>Be a part of <span class="blue">RightArm</span></span></h1>
+            <div class="part-txtpad">
+            	<p>We invite you to join hands with us in this great journey of Give and Receive. Nothing is too small or insignificant to give. In the words of Mahatma Gandhi, "To give pleasure to a single heart by a single act is better than a thousand heads bowing in prayer ". </p>
+                <div class="form-social-pad">
+                    <div class="form-pad">
+						<form id="register_form" name="register_form" action="{% url 'registration_register' %}" method="post">{% csrf_token %}
+							<div id="register_errors"></div>
+                            <div class="fname">
+							<input class="smallbox left" type="text" name="first_name" placeholder="First Name">
+							</div>
+                            <input class="smallbox right" type="text" placeholder ="Last Name">
+							<input type="text" id="email" name="email" placeholder="Email" >
+							<input  id="id_password1" type="password"  name="password1" onFocus="fnshow(this,'Password');" onBlur="fnremove(this,'Password');" placeholder="Password"  >
+							<input  name="password2" type="password" placeholder="Re Enter Password">
+							<style>
+							    select.styled {padding: 1px 0px 0px 10px;}
+							</style>
+                        <div class="selbox_pad">
+                           <!--select name="country" class="styled">
+                               <option value="" style = "opacity: 1;border: 0px solid #E3E2E2;padding:0px 10px">Select Country</option>
+								{% for c in country_list %}
+									<option value="{{c.id}}" style = "opacity: 1;border: 0px solid #E3E2E2;padding:0px 10px">{{c.name}}</option>
+								{% endfor %}
+                           </select-->
+                           <select name="country" class="styled" style = "opacity: 1;border: 1px solid #E3E2E2;">
+                               <option value="">Select Country</option>
+								{% for c in country_list %}
+									<option value="{{c.id}}">{{c.name}}</option>
+								{% endfor %}
+                           </select>
+                       </div>
+							<input type="text" name="pincode" placeholder="Pincode">
+							<input type="submit" value="Submit" name="Submit"  >
+							<div class="clear"></div>
+						</form>
+                    </div>
+                    <div class="social-pad">
+                    	<h1>or sign up with</h1>
+                        <a href="/facebook_login/" class="facebook" title="Facebook" ><img src="/static/images/ico-facebook.jpg" class="social-ico"><span class="social-txt">Facebook</span></a>
+                        <a rel="nofollow" href="{% url 'socialauth_begin' backend='linkedin' %}?register=true" class="linkedin" title="LinkedIn"><img src="/static/images/ico-linkedin.jpg" class="social-ico"><span class="social-txt">LinkedIn</span></a>
+                        <a rel="nofollow" href="{% url 'openid-login' %}" class="gplus" title="Google+"><img src="/static/images/ico-gplus.jpg" class="social-ico"><span class="social-txt">Google+</span></a>
+                        <input type="checkbox" name="1" class="styled" style = "display:block;" /><div class="chkbox-txt">Sign up for newsletter for updates on new Issues</div>
+                    </div>
+                    <div class="social-pad">
+                    	<h1>Join us on Social Media</h1>
+                    	<a href="https://www.facebook.com/rightarmco" class="facebook" target="_blank">Like us on Facebook</a>
+                        <a href="http://www.linkedin.com/company/rightarm" class="linkedin" target="_blank">Join us on LinkedIn</a>
+                        <a href="https://twitter.com/RightArmTweets" class="twitter" target="_blank">Follow us on Twitter</a>
+                    </div>
+                </div>
+           	</div>
+        </section><!--Part of RightArm Ends-->
+    </section><!--wrapper Ends-->
+</section><!--Contentarea Top Ends-->
+{% endblock %}
+
+<footer><!-- Footer Start -->
+	<section class="btm-box">
+        <div class="wrapper"><!-- Footer1 wrapper Starts-->
+            <div class="blog-feed">
+               <!-- <h1>Blog Feeds</h1>
+                <h2>title of the feed</h2>
+                <div class="author-name">Author Name, 17th April, 2014</div>
+                <div class="img-left"><img src="/static/images/img-feed.jpg" alt="" border="0"></div>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. <a href="#">Read more...</a></p>-->
+                <div class="nav_buttons">
+                    <ul>
+                        <li><a href="/join-rightarm/">Sign Up</a></li>
+                        <li><a href="/problems/challenge/">give</a></li>
+                        <li><a href="/problems/challenge/#receiver">receive</a></li>
+                        <!--li><a href="/discussions/topic/{{top_id}}">discussion</a></li-->
+                        <li><a {% with request|get_latest_topic as top_id %} href="/discussions/topic/{{top_id}}" {% endwith %} >discussion</a></li>
+                        <li><a href="{% url 'faq' %}">faq</a></li>
+                        <li><a href="/about-us/">about us</a></li>
+                    </ul>
+                </div>
+
+                <ul id="ul1">
+                       <li><a href="https://www.facebook.com/rightarmco" id="s0" title="facebook" target="_blank"><span>facebook</span></a></li>
+                        <li><a href="https://twitter.com/RightArmTweets" id="s1" title="twitter" target="_blank"><span>twitter</span></a></li>
+                        <li><a id="s2" href="http://www.linkedin.com/company/rightarm" title="linked in" target="_blank"><span>linked in</span></a></li>
+                </ul>
+            </div>
+            <div class="contact-box">
+                <h1><a href="{% url 'contact_us' %}">Contact Us</a></h1>
+                <ul>
+                    <!--<li>-->
+                    <!--    <span>RightArm Holdings Pte. Ltd,</span>-->
+                    <!--    <br>25 Holland Hill, #04-04 Holland Park,-->
+                    <!--    <br>Singapore 278740-->
+                    <!--</li>-->
+                    <!--<li>-->
+                    <!--    <span>India Operations</span>-->
+                    <!--    <br>A-605, Rishabh Platinum, Ahinsa Khand2,-->
+                    <!--    <br>Indrapuram,Ghaziabad – 201 014-->
+                    <!--    <br>U.P., India-->
+                    <!--</li>-->
+                    <li>
+                        <!--Devendra Bahadur, Head – India Operations-->
+                        <br>Email :&nbsp;<a href="mailto:devendra.bahadur@rightarm.com">contact@rightarm.com</a>
+                        <br>Devendra Bahadur <br>Head - India Operations
+                        <br>Phone &nbsp;:&nbsp;+91 98911 50100
+
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+    <!-- Footer1 wrapper Ends-->
+    <div class="wrapper">
+        <!-- Footer2 wrapper Starts-->
+        <div class="foot-link"><a href="{% url 'terms_condition' %}">Terms and Conditions</a>  &nbsp; | &nbsp;  <a href="/policy/">Privacy policy</a>
+		</div>
+        <div class="copy_right">
+            <a href="" >Copyright of RightArm Holdings Pte. Ltd 2014</a>
+        </div>
+        <div class="design_by">
+            <a href="http://mahiti.org" >Designed by Mahiti.org</a>
+        </div>
+    </div>
+    <!-- Footer2 wrapper Ends-->
+</footer>
+<!-- Footer End -->
+
+<script src="/static/js/jquery.meanmenu.js"></script>
+<script>
+	$(document).ready(function(e) {
+		$('.menu .nav').meanmenu();
+     });
+
+	$('.first_li').hover(
+  function () {
+	 $('.second_li').css('display','block');
+	 },
+	  function () {
+	 $('.second_li').css('display','none');
+	 });
+
+	 $('.second_li').hover(
+	  function () {
+	 $('.second_li').css('display','block');
+	 },
+	 function () {
+	 $('.second_li').css('display','none');
+	 }
+	 );
+
+
+ $('.third_li').hover(
+  function () {
+	 $('.four_li').css('display','block');
+	 },
+	  function () {
+	 $('.four_li').css('display','none');
+	 });;
+
+	 $('.four_li').hover(
+	  function () {
+	 $('.four_li').css('display','block');
+	 },
+	 function () {
+	 $('.four_li').css('display','none');
+	 }
+	 );
+</script>
+
+</body>
+</html>
